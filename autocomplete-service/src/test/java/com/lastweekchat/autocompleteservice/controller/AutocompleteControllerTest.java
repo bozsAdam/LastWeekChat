@@ -1,6 +1,7 @@
 package com.lastweekchat.autocompleteservice.controller;
 
 import com.lastweekchat.autocompleteservice.service.AutocompleteService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -11,12 +12,18 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class AutocompleteControllerTest {
 
+    private AutocompleteService autocompleteService;
 
+    @BeforeEach
+    public void getAutocompleteService() throws IOException {
+
+        autocompleteService = new AutocompleteService("assets/wordlist.txt");
+
+    }
 
     @Test
-    public void autoCompleteReturnListOfStrings() throws IOException {
+    public void autoCompleteReturnListOfStrings() {
 
-        AutocompleteService autocompleteService = new AutocompleteService("assets/wordlist.txt");
         List<String> results = autocompleteService.autoComplete("spectro");
         List<String> expected = Arrays.asList("spectrogram", "spectrograph", "spectrographic",
                 "spectrographically", "spectrometric", "spectrophotometer", "spectroscope",
@@ -26,11 +33,11 @@ class AutocompleteControllerTest {
     }
 
     @Test
-    public void autoCompleteReturnsEmptyList() throws IOException {
-        AutocompleteService autocompleteService = new AutocompleteService("assets/wordlist.txt");
+    public void autoCompleteReturnsEmptyList() {
+
         List<String> expected = Arrays.asList();
         assertEquals(expected, autocompleteService.autoComplete("sfsdf"));
-    }
 
+    }
 
 }

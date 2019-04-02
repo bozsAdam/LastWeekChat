@@ -2,16 +2,18 @@ package com.lastweekchat.autocompleteservice.service;
 
 import com.lastweekchat.autocompleteservice.model.TerminatingNode;
 import com.lastweekchat.autocompleteservice.model.TrieDataNode;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ResourceUtils;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import static java.nio.file.Files.readAllLines;
@@ -21,11 +23,13 @@ public class AutocompleteService {
 
 
     private TrieDataNode root;
+    private File file;
 
     /**
      * Starts a new Trie with dummy root data "-"
      */
     public AutocompleteService() throws IOException {
+
         root = new TrieDataNode('-');
         init();
     }
@@ -33,7 +37,8 @@ public class AutocompleteService {
     public AutocompleteService(String filepath) throws IOException {
 
         root = new TrieDataNode('-');
-        Path worldListPath = new File(filepath).toPath();
+        this.file = new File(filepath);
+        Path worldListPath = file.toPath();
         List<String> wordList = Files.readAllLines(worldListPath);
         for (String word : wordList) {
             addWord(word);
@@ -43,12 +48,15 @@ public class AutocompleteService {
     }
 
     public void init() throws IOException {
+
         FileSystemResource resource = new FileSystemResource("autocomplete-service/assets/wordlist.txt");
-        Path worldListPath = resource.getFile().toPath();
+        this.file = resource.getFile();
+        Path worldListPath = file.toPath();
         List<String> wordList = readAllLines(worldListPath);
         for (String word : wordList) {
             addWord(word);
         }
+
     }
 
     /**
@@ -112,6 +120,57 @@ public class AutocompleteService {
             words.add(sb.toString());
         }
 
+
+    }
+
+    public void checkForNewWords(String message) {
+
+        message = message.replaceAll("/[^a-zA-Z0-9\\s]+/g", "");
+        List<String> words = new ArrayList<>();
+        words.addAll(Arrays.asList(message.split(" ")));
+        Iterator iterator = words.iterator();
+        while(iterator.hasNext()) {
+            String next = (String)iterator.next();
+            if (autoComplete(next).size() == 0) {
+
+                saveWordToFile(next);
+
+            }
+        }
+
+    }
+
+    private void saveWordToFile(String word) {
+
+        BufferedWriter bw = null;
+        FileWriter fw = null;
+
+        try {
+            fw = new FileWriter(file, true);
+            bw = new BufferedWriter(fw);
+			bw.write(word + "\n");
+
+		} catch (IOException e) {
+
+			e.printStackTrace();
+
+		} finally {
+
+			try {
+
+				if (bw != null)
+					bw.close();
+
+				if (fw != null)
+					fw.close();
+
+			} catch (IOException ex) {
+
+				ex.printStackTrace();
+
+			}
+
+		}
 
     }
 }
