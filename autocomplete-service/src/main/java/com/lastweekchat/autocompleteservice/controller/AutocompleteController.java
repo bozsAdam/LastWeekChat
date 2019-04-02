@@ -21,7 +21,6 @@ public class AutocompleteController {
     @PostMapping("/autocomplete")
     public List<String> autcompleteWord(@RequestBody String word) throws IOException {
 
-        autocompleteService.addWord("danale");
         List<String> wordsToReturn = autocompleteService.autoComplete(word);
         return wordsToReturn;
 

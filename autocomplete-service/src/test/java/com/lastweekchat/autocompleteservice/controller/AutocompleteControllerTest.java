@@ -16,7 +16,7 @@ class AutocompleteControllerTest {
     @Test
     public void autoCompleteReturnListOfStrings() throws IOException {
 
-        AutocompleteService autocompleteService = new AutocompleteService();
+        AutocompleteService autocompleteService = new AutocompleteService("assets/wordlist.txt");
         List<String> results = autocompleteService.autoComplete("spectro");
         List<String> expected = Arrays.asList("spectrogram", "spectrograph", "spectrographic",
                 "spectrographically", "spectrometric", "spectrophotometer", "spectroscope",
@@ -27,7 +27,7 @@ class AutocompleteControllerTest {
 
     @Test
     public void autoCompleteReturnsEmptyList() throws IOException {
-        AutocompleteService autocompleteService = new AutocompleteService();
+        AutocompleteService autocompleteService = new AutocompleteService("assets/wordlist.txt");
         List<String> expected = Arrays.asList();
         assertEquals(expected, autocompleteService.autoComplete("sfsdf"));
     }

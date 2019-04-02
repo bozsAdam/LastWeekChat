@@ -2,10 +2,14 @@ package com.lastweekchat.autocompleteservice.service;
 
 import com.lastweekchat.autocompleteservice.model.TerminatingNode;
 import com.lastweekchat.autocompleteservice.model.TrieDataNode;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ResourceUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,12 +25,26 @@ public class AutocompleteService {
     /**
      * Starts a new Trie with dummy root data "-"
      */
-    public AutocompleteService() {
+    public AutocompleteService() throws IOException {
         root = new TrieDataNode('-');
+        init();
+    }
+
+    public AutocompleteService(String filepath) throws IOException {
+
+        root = new TrieDataNode('-');
+        Path worldListPath = new File(filepath).toPath();
+        List<String> wordList = Files.readAllLines(worldListPath);
+        for (String word : wordList) {
+            addWord(word);
+        }
+
+
     }
 
     public void init() throws IOException {
-        Path worldListPath = new File("assets/wordlist.txt").toPath();
+        FileSystemResource resource = new FileSystemResource("autocomplete-service/assets/wordlist.txt");
+        Path worldListPath = resource.getFile().toPath();
         List<String> wordList = readAllLines(worldListPath);
         for (String word : wordList) {
             addWord(word);
